@@ -66,6 +66,7 @@ const AdminLayout = () => {
           top: 0,
           bottom: 0,
           background: 'linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%)',
+          padding: '10px',
         }}
       >
         <div style={{
@@ -88,7 +89,8 @@ const AdminLayout = () => {
           items={menuItems}
           style={{
             borderRight: 0,
-            background: 'transparent'
+            background: 'transparent',
+            
           }}
           className="custom-menu"
         />
@@ -118,7 +120,7 @@ const AdminLayout = () => {
 
           <Space style={{ fontSize: '20px', fontWeight: '500', paddingRight: '20px', color: '#8b5cf6' }}>
             <div>
-              <p>Xin chào,</p>  
+              <p>Xin chào,</p>
             </div>
             <div>
               {user?.name || user?.email || 'Tribe Admin'}
