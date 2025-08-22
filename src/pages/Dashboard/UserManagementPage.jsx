@@ -13,7 +13,6 @@ const UserManagementPage = () => {
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchKey, setSearchKey] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
   const [blockingUsers, setBlockingUsers] = useState(new Set()); // Track which users are being blocked
   const [changingRoleUsers, setChangingRoleUsers] = useState(new Set()); // Track which users are having role changed
   const [roleModalVisible, setRoleModalVisible] = useState(false);
@@ -29,10 +28,10 @@ const UserManagementPage = () => {
 
 
 
-  const fetchUsers = async (page = 0, pageSize = 10, search = '', status = '') => {
+  const fetchUsers = async (page = 0, pageSize = 10, search = '') => {
     setLoading(true);
     try {
-      const response = await userService.getUsers(page, pageSize, search, status);
+      const response = await userService.getUsers(page, pageSize, search);
       console.log('API Response:', response);
       console.log('Users data:', response.content);
       setUsers(response.content || []);
@@ -50,12 +49,12 @@ const UserManagementPage = () => {
   };
 
   useEffect(() => {
-    fetchUsers(0, 10, searchKey, statusFilter);
-  }, [searchKey, statusFilter]);
+    fetchUsers(0, 10, searchKey);
+  }, [searchKey]);
 
   const handleTableChange = (paginationInfo) => {
     const { current, pageSize } = paginationInfo;
-    fetchUsers(current - 1, pageSize, searchKey, statusFilter);
+    fetchUsers(current - 1, pageSize, searchKey);
   };
 
   const handleSearch = async (value) => {
@@ -63,18 +62,7 @@ const UserManagementPage = () => {
     setSearchLoading(true);
     setPagination(prev => ({ ...prev, current: 1 })); // Reset về trang 1
     try {
-      await fetchUsers(0, pagination.pageSize, value, statusFilter);
-    } finally {
-      setSearchLoading(false);
-    }
-  };
-
-  const handleStatusFilterChange = async (value) => {
-    setStatusFilter(value);
-    setSearchLoading(true);
-    setPagination(prev => ({ ...prev, current: 1 })); // Reset về trang 1
-    try {
-      await fetchUsers(0, pagination.pageSize, searchKey, value);
+      await fetchUsers(0, pagination.pageSize, value);
     } finally {
       setSearchLoading(false);
     }
@@ -82,9 +70,8 @@ const UserManagementPage = () => {
 
   const handleRefresh = () => {
     setSearchKey('');
-    setStatusFilter('');
     setPagination(prev => ({ ...prev, current: 1 }));
-    fetchUsers(0, pagination.pageSize, '', '');
+    fetchUsers(0, pagination.pageSize, '');
   };
 
   const handleChangeRole = (user) => {
@@ -107,7 +94,7 @@ const UserManagementPage = () => {
       message.success(`Đã thay đổi vai trò người dùng thành công`);
 
       // Refresh data
-      await fetchUsers(pagination.current - 1, pagination.pageSize, searchKey, statusFilter);
+      await fetchUsers(pagination.current - 1, pagination.pageSize, searchKey);
 
       // Close modal
       setRoleModalVisible(false);
@@ -162,7 +149,7 @@ const UserManagementPage = () => {
     try {
       await userService.blockUser(userId, !isBlocked, `Được ${action} bởi admin`);
       message.success(`Đã ${action} người dùng thành công`);
-      await fetchUsers(pagination.current - 1, pagination.pageSize, searchKey, statusFilter);
+      await fetchUsers(pagination.current - 1, pagination.pageSize, searchKey);
     } catch (error) {
       console.error('Error blocking user:', error);
       message.error(`Không thể ${action} người dùng: ${error.message || 'Lỗi không xác định'}`);
@@ -183,15 +170,11 @@ const UserManagementPage = () => {
     setBlockModalData(null);
   };
 
-  const getStatusTag = (status, isBlocked) => {
+  const getStatusTag = (isBlocked) => {
     if (isBlocked) {
       return <Tag color="red">Bị chặn</Tag>;
     }
-    return status === 'active' ? (
-      <Tag color="green">Hoạt động</Tag>
-    ) : (
-      <Tag color="orange">Không hoạt động</Tag>
-    );
+    return <Tag color="green">Hoạt động</Tag>;
   };
 
   const getRoleTag = (role) => {
@@ -256,9 +239,9 @@ const UserManagementPage = () => {
       render: (phone) => phone || <Text type="secondary">-</Text>,
     },
     {
-      title: 'Trạng thái',
+      title: 'Trạng thái bị chặn',
       key: 'status',
-      render: (_, record) => getStatusTag(record.status, record.isBlocked),
+      render: (_, record) => getStatusTag(record.isBlocked),
     },
     {
       title: 'Vai trò',
@@ -350,20 +333,7 @@ const UserManagementPage = () => {
             style={{ borderRadius: '8px' }}
           />
         </Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
-          <Select
-            placeholder="Lọc theo trạng thái"
-            allowClear
-            size="large"
-            style={{ width: '100%', borderRadius: '8px' }}
-            value={statusFilter}
-            onChange={handleStatusFilterChange}
-            options={[
-              { value: 'active', label: 'Hoạt động' },
-              { value: 'inactive', label: 'Không hoạt động' },
-            ]}
-          />
-        </Col>
+
         <Col xs={24} sm={24} md={8} lg={6}>
           <Button
             icon={<ReloadOutlined />}
