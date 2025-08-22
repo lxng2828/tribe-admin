@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { baseURL } from './baseURLvariable';
 
 // Tạo instance Axios với cấu hình cơ bản
 const axiosClient = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -35,40 +36,40 @@ axiosClient.interceptors.response.use(
         return Promise.reject(new Error(response.data.status.displayMessage));
       }
     }
-    
+
     // Nếu không có cấu trúc status, trả về response.data
     return response.data;
   },
   (error) => {
     // Trường hợp thất bại HTTP (4xx, 5xx) hoặc lỗi mạng
     let errorMessage = 'Đã xảy ra lỗi không xác định';
-    
+
     if (error.response) {
       // Có response từ server
       const { status } = error.response;
-      
+
       // Handle 401 Unauthorized (token expired or invalid)
       if (status === 401) {
         // Clear authentication data
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
-        
+
         // Redirect to login if not already there
         if (window.location.pathname !== '/login') {
           window.location.href = '/login';
         }
       }
-      
+
       // Handle 403 Forbidden (user doesn't have permission)
       if (status === 403) {
         // Clear authentication data
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
-        
+
         // Redirect to login with access denied message
         window.location.href = '/login?error=access_denied';
       }
-      
+
       if (error.response.data && error.response.data.status) {
         errorMessage = error.response.data.status.displayMessage;
       } else if (error.response.data && error.response.data.message) {
@@ -83,7 +84,7 @@ axiosClient.interceptors.response.use(
       // Lỗi khác
       errorMessage = error.message;
     }
-    
+
     return Promise.reject(new Error(errorMessage));
   }
 );
