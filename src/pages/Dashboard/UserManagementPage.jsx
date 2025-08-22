@@ -3,6 +3,7 @@ import { Table, Tag, Avatar, Typography, Space, Input, Select, Row, Col, Button,
 import { UserOutlined, SearchOutlined, ReloadOutlined, StopOutlined, CheckCircleOutlined, TeamOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import userService from '../../services/userService';
+import { baseURL } from '../../api/baseURLvariable';
 
 const { Text } = Typography;
 const { Search } = Input;
@@ -32,6 +33,8 @@ const UserManagementPage = () => {
     setLoading(true);
     try {
       const response = await userService.getUsers(page, pageSize, search, status);
+      console.log('API Response:', response);
+      console.log('Users data:', response.content);
       setUsers(response.content || []);
       setPagination({
         current: response.pageable?.pageNumber + 1 || 1,
@@ -102,10 +105,10 @@ const UserManagementPage = () => {
     try {
       await userService.changeUserRole(selectedUser.id, newRole);
       message.success(`Đã thay đổi vai trò người dùng thành công`);
-      
+
       // Refresh data
       await fetchUsers(pagination.current - 1, pagination.pageSize, searchKey, statusFilter);
-      
+
       // Close modal
       setRoleModalVisible(false);
       setSelectedUser(null);
@@ -136,7 +139,7 @@ const UserManagementPage = () => {
       message.error('ID người dùng không hợp lệ');
       return;
     }
-    
+
     const action = isBlocked ? 'bỏ chặn' : 'chặn';
     const content = `Bạn có chắc muốn ${action} người dùng "${userName}" không?`;
 
@@ -155,7 +158,7 @@ const UserManagementPage = () => {
 
     const { userId, isBlocked, action } = blockModalData;
     setBlockingUsers(prev => new Set(prev).add(userId));
-    
+
     try {
       await userService.blockUser(userId, !isBlocked, `Được ${action} bởi admin`);
       message.success(`Đã ${action} người dùng thành công`);
@@ -170,7 +173,7 @@ const UserManagementPage = () => {
         return newSet;
       });
     }
-    
+
     setBlockModalVisible(false);
     setBlockModalData(null);
   };
@@ -207,21 +210,38 @@ const UserManagementPage = () => {
     {
       title: 'Người dùng',
       key: 'user',
-      render: (_, record) => (
-        <Space>
-          <Avatar 
-            src={record.avatarUrl} 
-            icon={<UserOutlined />}
-            size="large"
-          />
-          <div>
-            <div style={{ fontWeight: '500' }}>{record.displayName}</div>
-            <Text type="secondary" style={{ fontSize: '12px' }}>
-              ID: {record.id?.slice(0, 8)}...
-            </Text>
-          </div>
-        </Space>
-      ),
+      render: (_, record) => {
+        console.log('User record for avatar:', record);
+        console.log('Avatar URL:', record.avatarUrl);
+
+        let avatarSrc = null;
+        if (record.avatarUrl) {
+          if (record.avatarUrl.startsWith('/')) {
+            avatarSrc = `${baseURL}${record.avatarUrl}`;
+          }
+          else {
+            avatarSrc = record.avatarUrl;
+          }
+        }
+
+        console.log('Processed avatar URL:', avatarSrc);
+
+        return (
+          <Space>
+            <Avatar
+              src={avatarSrc}
+              icon={<UserOutlined />}
+              size="large"
+            />
+            <div>
+              <div style={{ fontWeight: '500' }}>{record.displayName}</div>
+              <Text type="secondary" style={{ fontSize: '12px' }}>
+                ID: {record.id?.slice(0, 8)}...
+              </Text>
+            </div>
+          </Space>
+        );
+      },
     },
     {
       title: 'Email',
@@ -349,8 +369,8 @@ const UserManagementPage = () => {
             icon={<ReloadOutlined />}
             size="large"
             onClick={handleRefresh}
-            style={{ 
-              width: '100%', 
+            style={{
+              width: '100%',
               borderRadius: '8px',
               backgroundColor: '#8b5cf6',
               borderColor: '#8b5cf6',
@@ -361,7 +381,7 @@ const UserManagementPage = () => {
           </Button>
         </Col>
       </Row>
-      
+
       <Table
         columns={columns}
         dataSource={users}
@@ -370,7 +390,7 @@ const UserManagementPage = () => {
           ...pagination,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) => 
+          showTotal: (total, range) =>
             `${range[0]}-${range[1]} của ${total} người dùng`,
           pageSizeOptions: ['10', '20', '50', '100'],
         }}
@@ -417,7 +437,7 @@ const UserManagementPage = () => {
             {newRole && newRole !== selectedUser.role && (
               <div style={{ marginTop: 16, padding: 12, backgroundColor: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 6 }}>
                 <p style={{ margin: 0, color: '#52c41a' }}>
-                  <strong>Thay đổi:</strong> Từ "{selectedUser.role === 'ROLE_ADMIN' ? 'Quản trị viên' : 'Người dùng'}" 
+                  <strong>Thay đổi:</strong> Từ "{selectedUser.role === 'ROLE_ADMIN' ? 'Quản trị viên' : 'Người dùng'}"
                   thành "{newRole === 'ROLE_ADMIN' ? 'Quản trị viên' : 'Người dùng'}"
                 </p>
               </div>
@@ -436,11 +456,11 @@ const UserManagementPage = () => {
         cancelText="Hủy"
         okType={blockModalData?.isBlocked ? 'default' : 'primary'}
         confirmLoading={blockModalData ? blockingUsers.has(blockModalData.userId) : false}
-        okButtonProps={{ 
-          style: { 
-            backgroundColor: blockModalData?.isBlocked ? '#52c41a' : '#8b5cf6', 
-            borderColor: blockModalData?.isBlocked ? '#52c41a' : '#8b5cf6' 
-          } 
+        okButtonProps={{
+          style: {
+            backgroundColor: blockModalData?.isBlocked ? '#52c41a' : '#8b5cf6',
+            borderColor: blockModalData?.isBlocked ? '#52c41a' : '#8b5cf6'
+          }
         }}
       >
         {blockModalData && (
