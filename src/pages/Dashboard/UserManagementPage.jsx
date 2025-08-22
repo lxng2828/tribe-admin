@@ -312,10 +312,6 @@ const UserManagementPage = () => {
     <div>
       <div style={{ marginBottom: 16 }}>
         <Typography.Title level={3} style={{ color: '#8b5cf6', fontWeight: 'bold' }}>Quản lý người dùng - Tribe Admin</Typography.Title>
-        <Text type="secondary" style={{ fontSize: '16px' }}>
-          Tổng cộng {pagination.total} người dùng
-        </Text>
-
       </div>
 
       {/* Search and Filter Section */}
