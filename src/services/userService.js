@@ -6,10 +6,10 @@ const userService = {
       page: page.toString(),
       size: size.toString(),
     });
-    
+
     if (search) params.append('search', search);
     if (status) params.append('status', status);
-    
+
     const response = await axiosClient.get(`/api/admin/users?${params}`);
     return response;
   },
@@ -49,12 +49,12 @@ const userService = {
       // Lấy tất cả người dùng để tính tổng số lần đăng nhập
       const response = await axiosClient.get('/api/admin/users?size=1000');
       const users = response.content || [];
-      
+
       // Tính tổng số lần đăng nhập
       const totalLoginCount = users.reduce((total, user) => {
         return total + (user.loginCount || 0);
       }, 0);
-      
+
       return totalLoginCount;
     } catch (error) {
       console.error('Error getting total login count:', error);

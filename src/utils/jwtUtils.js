@@ -10,7 +10,7 @@ export const decodeJWT = (token) => {
         .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
         .join('')
     );
-    
+
     return JSON.parse(jsonPayload);
   } catch (error) {
     console.error('Error decoding JWT:', error);
@@ -24,7 +24,7 @@ export const getUserFromToken = (token) => {
   if (!decoded) {
     return null;
   }
-  
+
   return {
     id: decoded.id,
     name: decoded.name,

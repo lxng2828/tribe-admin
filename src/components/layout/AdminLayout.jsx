@@ -1,9 +1,9 @@
 import React from 'react';
 import { Layout, Menu, Button, Row, Col, Avatar, Typography, Space, message } from 'antd';
 import { Modal } from 'antd';
-import { 
-  DashboardOutlined, 
-  UserOutlined, 
+import {
+  DashboardOutlined,
+  UserOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined
@@ -53,9 +53,9 @@ const AdminLayout = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider 
-        trigger={null} 
-        collapsible 
+      <Sider
+        trigger={null}
+        collapsible
         collapsed={collapsed}
         theme="dark"
         style={{
@@ -68,10 +68,10 @@ const AdminLayout = () => {
           background: 'linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%)',
         }}
       >
-        <div style={{ 
-          height: '64px', 
-          display: 'flex', 
-          alignItems: 'center', 
+        <div style={{
+          height: '64px',
+          display: 'flex',
+          alignItems: 'center',
           justifyContent: 'center',
           borderBottom: '1px solid rgba(255,255,255,0.1)',
           background: 'rgba(255,255,255,0.05)'
@@ -80,13 +80,13 @@ const AdminLayout = () => {
             {collapsed ? 'TA' : 'Tribe Admin'}
           </Title>
         </div>
-        
+
         <Menu
           theme="dark"
           mode="inline"
           selectedKeys={[location.pathname]}
           items={menuItems}
-          style={{ 
+          style={{
             borderRight: 0,
             background: 'transparent'
           }}
@@ -95,9 +95,9 @@ const AdminLayout = () => {
       </Sider>
 
       <Layout style={{ marginLeft: collapsed ? 80 : 200, transition: 'margin-left 0.2s' }}>
-        <Header style={{ 
-          padding: '0 16px', 
-          background: 'linear-gradient(90deg, #faf5ff 0%, #f8fafc 100%)', 
+        <Header style={{
+          padding: '0 16px',
+          background: 'linear-gradient(90deg, #faf5ff 0%, #f8fafc 100%)',
           boxShadow: '0 2px 8px rgba(139, 92, 246, 0.1)',
           display: 'flex',
           alignItems: 'center',
@@ -115,14 +115,16 @@ const AdminLayout = () => {
               color: '#8b5cf6'
             }}
           />
-          
-          <Space>
-              <div style={{ fontSize: '14px', fontWeight: '500', paddingRight: '20px', color: '#8b5cf6'}}>
-                {user?.name || user?.email || 'Tribe Admin'}
-              </div>
-            <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#8b5cf6' }} />
-            <Button 
-              type="text" 
+
+          <Space style={{ fontSize: '20px', fontWeight: '500', paddingRight: '20px', color: '#8b5cf6' }}>
+            <div>
+              <p>Xin chào,</p>  
+            </div>
+            <div>
+              {user?.name || user?.email || 'Tribe Admin'}
+            </div>
+            <Button
+              type="text"
               icon={<LogoutOutlined />}
               onClick={handleLogout}
               style={{ color: '#8b5cf6' }}
@@ -132,7 +134,7 @@ const AdminLayout = () => {
           </Space>
         </Header>
 
-        <Content style={{ 
+        <Content style={{
           margin: '24px 16px',
           padding: '24px',
           background: '#faf5ff',
